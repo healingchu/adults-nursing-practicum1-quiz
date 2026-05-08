@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>성인간호학실습 퀴즈 | 단국대학교 간호대학</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F4F2ED;
+  --surface: #FFFFFF;
+  --surface2: #EDEAE3;
+  --border: #D5D2CA;
+  --border2: #C2BFB6;
+  --text: #1C1A17;
+  --text-muted: #6A6760;
+  --text-hint: #A5A29B;
+  --accent: #2A5F8F;
+  --accent-light: #E3EDF6;
+  --accent-text: #1A3D5C;
+  --green: #2A6B4F;
+  --green-light: #E1F0EA;
+  --green-text: #1A4A34;
+  --red: #B83232;
+  --red-light: #FAEAEA;
+  --red-text: #7A1F1F;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ── INTRO SCREEN ── */
+#intro {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.logo-badge {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+#intro h1 {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+
+#intro p {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 1.25rem;
+}
+
+.cat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.cat-card.selected { border: 2px solid var(--accent); background: var(--accent-light); }
+
+.cat-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.cat-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.cat-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cat-count {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-hint);
+}
+
+.start-btn {
+  width: 100%;
+  max-width: 700px;
+  padding: 16px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: var(--sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.start-btn:hover { opacity: 0.85; }
+.start-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── QUIZ SCREEN ── */
+#quiz { display: none; min-height: 100vh; padding: 1.5rem 1rem 3rem; }
+
+.quiz-inner { max-width: 580px; margin: 0 auto; }
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.top-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
+
+.prog-track {
+  width: 100%;
+  height: 3px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.prog-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  animation: fadeIn 0.25s ease both;
+}
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.q-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  background: var(--surface2);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 3px 9px;
+  margin-bottom: 1rem;
+}
+
+.q-prompt { font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+
+.q-main {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-family: var(--mono);
+  line-height: 1.2;
+  margin-bottom: 0.4rem;
+  word-break: break-all;
+}
+
+.q-main.ko { font-family: var(--sans); font-size: 1.4rem; }
+
+.q-hint { font-size: 0.8rem; color: var(--text-hint); line-height: 1.6; margin-top: 0.25rem; }
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.opt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 0.85rem;
+  font-size: 0.875rem;
+  font-family: var(--sans);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.45;
+  transition: background 0.12s, border-color 0.12s, transform 0.08s;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.opt:hover:not(:disabled) { background: var(--surface2); border-color: var(--border2); transform: translateY(-1px); }
+.opt:active:not(:disabled) { transform: scale(0.98); }
+.opt .num { font-family: var(--mono); font-size: 0.7rem; color: var(--text-hint); flex-shrink: 0; padding-top: 2px; }
+
+.opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green-text); }
+.opt.correct .num { color: var(--green); }
+.opt.wrong { background: var(--red-light); border-color: var(--red); color: var(--red-text); }
+.opt.wrong .num { color: var(--red); }
+.opt.reveal { background: var(--green-light); border-color: var(--green); color: var(--green-text); opacity: 0.5; }
+.opt.reveal .num { color: var(--green); }
+
+.feedback { min-height: 1.5rem; font-size: 0.875rem; padding-left: 2px; margin-bottom: 0.875rem; }
+.feedback.ok { color: var(--green-text); font-weight: 500; }
+.feedback.ng { color: var(--red-text); }
+
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--text);
+  border: none;
+  border-radius: 12px;
+  color: var(--bg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: var(--sans);
+  cursor: pointer;
+  display: none;
+  transition: opacity 0.12s;
+}
+.next-btn:hover { opacity: 0.85; }
+
+/* ── RESULT ── */
+.result-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  animation: fadeIn 0.4s ease both;
+}
+
+.result-score-big {
+  font-family: var(--mono);
+  font-size: 4rem;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.result-pct {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 1.25rem;
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.ok { background: var(--green); }
+.dot.ng { background: var(--red); }
+
+.result-msg { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; }
+.result-sub { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+.result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.action-btn {
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.action-btn.primary { background: var(--text); color: var(--bg); border: none; }
+.action-btn.primary:hover { opacity: 0.85; }
+.action-btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.action-btn.secondary:hover { background: var(--surface2); }
+
+@media (max-width: 500px) {
+  .options { grid-template-columns: 1fr; }
+  .q-main { font-size: 1.3rem; }
+  .category-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <div class="logo-badge">단국대학교 간호대학 · 성인간호학실습1</div>
+  <h1>간호학 퀴즈</h1>
+  <p>카테고리를 선택하고 학습을 시작하세요</p>
+
+  <div class="category-grid" id="cat-grid"></div>
+  <button class="start-btn" id="start-btn" onclick="startQuiz()" disabled>카테고리를 선택하세요</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="quiz-inner">
+    <div class="top-bar">
+      <span class="top-label" id="q-counter">01 / 10</span>
+      <span class="top-label" id="q-score">점수 0</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div id="q-area"></div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = {
+  cbc: {
+    icon: '🩸',
+    title: 'CBC · 혈액검사',
+    sub: '정상범위 & 수치 판단',
+    questions: [
+      { q:'남성 Hemoglobin 정상 하한값은?', a:'13.0 g/dL', opts:['11.0 g/dL','12.0 g/dL','13.0 g/dL','14.0 g/dL'], hint:'단위: g/dL' },
+      { q:'여성 Hemoglobin 정상 상한값은?', a:'15.5 g/dL', opts:['14.0 g/dL','15.5 g/dL','16.5 g/dL','17.0 g/dL'], hint:'남성은 16.5 g/dL' },
+      { q:'WBC 정상 상한값은?', a:'10.0 × 10³/μL', opts:['8.0 × 10³/μL','10.0 × 10³/μL','12.0 × 10³/μL','15.0 × 10³/μL'], hint:'하한: 4.0 × 10³/μL' },
+      { q:'Platelet 정상 하한값은?', a:'150 × 10³/μL', opts:['100 × 10³/μL','120 × 10³/μL','150 × 10³/μL','200 × 10³/μL'], hint:'상한: 370 × 10³/μL' },
+      { q:'PT(INR) 정상 범위는?', a:'0.8 ~ 1.3', opts:['0.5 ~ 1.0','0.8 ~ 1.3','1.0 ~ 1.5','1.2 ~ 1.8'], hint:'혈액응고검사 항목' },
+      { q:'aPTT 정상 상한값은?', a:'45 sec', opts:['33 sec','38 sec','45 sec','60 sec'], hint:'하한: 33 sec' },
+      { q:'혈청 Na(나트륨) 정상 범위는?', a:'135~145 mEq/L', opts:['120~130 mEq/L','130~140 mEq/L','135~145 mEq/L','140~150 mEq/L'], hint:'전해질검사 항목' },
+      { q:'혈청 K(칼륨) 정상 하한값은?', a:'3.5 mEq/L', opts:['2.5 mEq/L','3.0 mEq/L','3.5 mEq/L','4.0 mEq/L'], hint:'상한: 5.5 mEq/L' },
+      { q:'혈청 Ca(칼슘) 정상 상한값은?', a:'10 mg/dL', opts:['8.6 mg/dL','9.0 mg/dL','10 mg/dL','12 mg/dL'], hint:'하한: 8.6 mg/dL' },
+      { q:'동맥혈가스검사(ABGA) 정상 pH 범위는?', a:'7.35~7.45', opts:['7.20~7.30','7.25~7.35','7.35~7.45','7.40~7.50'], hint:'산염기 균형 확인 지표' },
+      { q:'ABGA 정상 PCO2 범위는?', a:'35~45 mmHg', opts:['25~35 mmHg','35~45 mmHg','45~55 mmHg','55~65 mmHg'], hint:'CO2 분압' },
+      { q:'ABGA 정상 HCO3- 범위는?', a:'22~26 mEq/L', opts:['18~22 mEq/L','22~26 mEq/L','26~30 mEq/L','30~35 mEq/L'], hint:'중탄산염 수치' },
+      { q:'공복혈당(Glucose) 정상 상한값은?', a:'99 mg/dL', opts:['80 mg/dL','99 mg/dL','110 mg/dL','126 mg/dL'], hint:'8시간 이상 공복 기준' },
+      { q:'HbA1c 정상 상한값은?', a:'5.7%', opts:['4.0%','5.0%','5.7%','6.5%'], hint:'당뇨 진단 기준과 다름' },
+      { q:'Total Cholesterol 정상 기준은?', a:'< 200 mg/dL', opts:['< 150 mg/dL','< 200 mg/dL','< 240 mg/dL','< 300 mg/dL'], hint:'지질검사 항목' },
+      { q:'LDH 정상 하한값은?', a:'120 IU/L', opts:['80 IU/L','100 IU/L','120 IU/L','150 IU/L'], hint:'심장효소 검사 항목, 상한: 250 IU/L' },
+      { q:'Troponin I 정상 상한값은?', a:'< 60 pg/mL', opts:['< 10 pg/mL','< 30 pg/mL','< 60 pg/mL','< 100 pg/mL'], hint:'심근경색 진단에 사용' },
+      { q:'Albumin 정상 하한값은?', a:'3.7 g/dL', opts:['2.5 g/dL','3.0 g/dL','3.7 g/dL','4.0 g/dL'], hint:'상한: 4.9 g/dL' },
+      { q:'BUN 정상 범위는?', a:'6~20 mg/dL', opts:['2~10 mg/dL','6~20 mg/dL','10~30 mg/dL','15~40 mg/dL'], hint:'신기능 평가 항목' },
+      { q:'여성 Hematocrit 정상 범위는?', a:'33.0~45.0%', opts:['28~38%','33~45%','39~51%','42~54%'], hint:'남성: 39.0~51.0%' },
+    ]
+  },
+  abbr_gen: {
+    icon: '📋',
+    title: '일반 약어',
+    sub: '영문 약어 → 한글 뜻',
+    questions: [
+      { q:'CC', a:'주 호소', opts:['주 호소','과거력','가족력','현 병력'], hint:'Chief Complaint' },
+      { q:'GCS', a:'글라스고 혼수 척도', opts:['글라스고 혼수 척도','근전도 검사','신체검진','혈당검사'], hint:'Glasgow Coma Scale' },
+      { q:'PMHx', a:'과거력', opts:['가족력','과거력','현 병력','사회력'], hint:'Past Medical History' },
+      { q:'FHx', a:'가족력', opts:['현 병력','과거력','가족력','사회력'], hint:'Family History' },
+      { q:'DTR', a:'심부건 반사', opts:['각막반사','심부건 반사','외안근 운동','신경학적 검사'], hint:'Deep Tendon Reflex' },
+      { q:'LOC', a:'의식수준', opts:['의식수준','침상안정','신체검진','체온'], hint:'Level of Consciousness' },
+      { q:'BR', a:'침상안정', opts:['체온','혈당검사','침상안정','외래'], hint:'Bed Rest' },
+      { q:'OPD', a:'외래', opts:['중환자실','수술실','외래','응급실'], hint:'Outpatient Department' },
+      { q:'GERD', a:'위-식도 역류 질환', opts:['위염','위-식도 역류 질환','담낭염','대장염'], hint:'Gastroesophageal Reflux Disease' },
+      { q:'MRSA', a:'메티실린 내성 황색포도상구균', opts:['메티실린 내성 황색포도상구균','항생제 피부반응검사','균혈증','패혈증'], hint:'Methicillin Resistant Staphylococcus Aureus' },
+      { q:'BST', a:'혈당검사', opts:['체온','혈당검사','폐기능 검사','신체검진'], hint:'Blood Sugar Test' },
+      { q:'HIVD', a:'추간판 탈출증', opts:['무혈관 괴사','추간판 탈출증','척추 천자','심방중격 결손'], hint:'Herniated Intervertebral Disc' },
+      { q:'FFP', a:'신선 동결 혈장', opts:['신선 동결 혈장','전혈','농축적혈구','혈소판'], hint:'Fresh Frozen Plasma' },
+      { q:'PTGBD', a:'경피경간담관배액술', opts:['경피경간담관배액술','경피적 관상동맥 중재술','역행성 담췌관 조영술','경피적 도관 배액술'], hint:'Percutaneous Transhepatic Gallbladder Drainage' },
+      { q:'SFP', a:'세미파울러 자세', opts:['트렌델렌버그 자세','세미파울러 자세','앙와위','측와위'], hint:'Semi Fowler\'s Position' },
+      { q:'EMG', a:'근전도 검사', opts:['신경전도속도','근전도 검사','뇌파 검사','폐기능 검사'], hint:'Electromyography' },
+      { q:'CVAT', a:'늑골척추각 압통', opts:['늑간 공간','늑골척추각 압통','각막반사','심부건 반사'], hint:'Costovertebral Angle Tenderness' },
+      { q:'PERRLA 뜻의 일부: \'R\'은?', a:'Round', opts:['Regular','Round','React','Reflex'], hint:'Pupils, Equal, Round, Regular, React to Light & Accommodation' },
+      { q:'G/A', a:'전반적 외관', opts:['전반적 외관','추가 검사','신체검진','현 병력'], hint:'General Appearance' },
+      { q:'MRM', a:'변형근치유방절제', opts:['변형근치유방절제','유방생검','유방촬영술','유방성형'], hint:'Modified Radical Mastectomy' },
+    ]
+  },
+  abbr_test: {
+    icon: '🔬',
+    title: '검사·시술 약어',
+    sub: '검사명 약어 → 뜻',
+    questions: [
+      { q:'ABGA', a:'동맥혈가스분석', opts:['동맥혈가스분석','말초혈액 도말','중심정맥압','폐기능검사'], hint:'Arterial Blood Gas Analysis' },
+      { q:'CAG', a:'관상동맥조영술', opts:['뇌혈관조영술','관상동맥조영술','대퇴동맥조영술','폐동맥조영술'], hint:'Coronary Angiography' },
+      { q:'ERCP', a:'내시경 역행성 담췌관 조영술', opts:['위내시경','대장내시경','내시경 역행성 담췌관 조영술','초음파내시경'], hint:'Endoscopic Retrograde Cholangiopancreatography' },
+      { q:'ESWL', a:'체외충격파쇄석술', opts:['체외충격파쇄석술','경피적 신루설치술','복막투석','혈액투석'], hint:'Extracorporeal Shock Wave Lithotripsy' },
+      { q:'GFS', a:'위내시경', opts:['대장내시경','위내시경','소장내시경','기관지내시경'], hint:'Gastrofiberscopy' },
+      { q:'PCI', a:'경피적 관상동맥 중재술', opts:['경피적 관상동맥 중재술','경피적 신루설치술','경피적 도관 배액술','경피세침흡인'], hint:'Percutaneous Coronary Intervention' },
+      { q:'PTCA', a:'경피적 경혈관 관상동맥 확장술', opts:['경피적 경혈관 관상동맥 확장술','관상동맥조영술','경피적 관상동맥 중재술','대퇴동맥 뇌혈관 조영술'], hint:'Percutaneous Transluminal Coronary Arteriography' },
+      { q:'TACE', a:'간동맥 화학색전술', opts:['간동맥 화학색전술','경피적간담낭배액술','간담도조영술','초음파촬영술'], hint:'Transcatheter Arterial Chemoembolization' },
+      { q:'TFCA', a:'대퇴동맥 경유 뇌혈관 조영술', opts:['대퇴동맥 경유 뇌혈관 조영술','관상동맥조영술','디지털 감산 혈관조영술','폐동맥조영술'], hint:'Transfemoral Cerebral Angiography' },
+      { q:'MRI', a:'자기공명영상', opts:['전산화단층촬영','자기공명영상','초음파촬영','핵의학검사'], hint:'Magnetic Resonance Imaging' },
+      { q:'PBS', a:'말초혈액 도말표본', opts:['말초혈액 도말표본','전혈구검사','혈액응고검사','골수검사'], hint:'Peripheral Blood Smear' },
+      { q:'NCV', a:'신경전도속도', opts:['근전도 검사','신경전도속도','뇌파 검사','유발전위검사'], hint:'Nerve Conduction Velocity' },
+      { q:'IVP', a:'정맥 신우조영술', opts:['정맥 담관조영술','정맥 신우조영술','역행성 신우조영술','경피적 신루설치술'], hint:'Intravenous Pyelography' },
+      { q:'UGIS', a:'상부위장관 조영술', opts:['하부위장관 조영술','소장 조영술','상부위장관 조영술','저장성샘창자조영술'], hint:'Upper Gastrointestinal Series' },
+      { q:'USG', a:'초음파촬영술', opts:['전산화단층촬영','자기공명영상','초음파촬영술','핵의학검사'], hint:'Ultrasonography' },
+      { q:'CVP', a:'중심정맥압', opts:['동맥혈압','중심정맥압','폐동맥압','폐모세혈관압'], hint:'Central Venous Pressure' },
+      { q:'EPS', a:'전기생리검사', opts:['근전도 검사','전기생리검사','신경전도속도','뇌파 검사'], hint:'Electrophysiologic Study' },
+      { q:'DSA', a:'디지털 감산 혈관조영술', opts:['디지털 감산 혈관조영술','관상동맥조영술','경피세침흡인','도관 배액술'], hint:'Digital Subtraction Angiography' },
+      { q:'HRCT', a:'고해상전산단층촬영술', opts:['일반전산단층촬영','고해상전산단층촬영술','자기공명영상','초음파'], hint:'High Resolution Computed Tomography' },
+      { q:'HLA', a:'사람 백혈구 항원', opts:['사람 적혈구 항원','사람 백혈구 항원','혈소판 항원','혈청 단백질'], hint:'Human Leukocyte Antigen' },
+    ]
+  },
+  abbr_disease: {
+    icon: '🫀',
+    title: '질환·증상 약어',
+    sub: '질환 약어 → 한글 진단명',
+    questions: [
+      { q:'COPD', a:'만성 폐쇄성 폐질환', opts:['성인 호흡곤란 증후군','만성 폐쇄성 폐질환','폐동맥고혈압','소세포 폐암'], hint:'Chronic Obstructive Pulmonary Disease' },
+      { q:'ARDS', a:'성인 호흡곤란 증후군', opts:['성인 호흡곤란 증후군','만성 폐쇄성 폐질환','폐동맥고혈압','폐렴'], hint:'Adult Respiratory Distress Syndrome' },
+      { q:'HTN', a:'고혈압', opts:['저혈압','고혈압','폐동맥고혈압','문맥고혈압'], hint:'Hypertension' },
+      { q:'MI', a:'심근경색', opts:['협심증','심근염','심근경색','심부전'], hint:'Myocardial Infarction' },
+      { q:'ARF', a:'급성 신부전', opts:['만성 신부전','급성 신부전','말기 신질환','신증후군'], hint:'Acute Renal Failure' },
+      { q:'CRF', a:'만성 신부전', opts:['급성 신부전','만성 신부전','말기 신질환','신증후군'], hint:'Chronic Renal Failure' },
+      { q:'Af', a:'심방세동', opts:['심방조동','심방세동','심실세동','발작성 상심실성 빈맥'], hint:'Atrial fibrillation (소문자 f)' },
+      { q:'SLE', a:'전신홍반루푸스', opts:['류마티스 관절염','전신홍반루푸스','강직성 척추염','다발성 경화증'], hint:'Systemic Lupus Erythematosus' },
+      { q:'LC', a:'간경화', opts:['급성 바이러스성 간염','간경화','간암','담낭염'], hint:'Liver Cirrhosis' },
+      { q:'ESRD', a:'말기 신질환', opts:['급성 신부전','만성 신부전','말기 신질환','신증후군'], hint:'End Stage Renal Disease' },
+      { q:'TOF', a:'팔로네징후', opts:['삼첨판 폐쇄','대혈관 전위','팔로네징후','심방중격결손'], hint:'Tetralogy of Fallot' },
+      { q:'SSS', a:'동기능 부전 증후군', opts:['발작성 심방 빈맥','동기능 부전 증후군','발작성 상심실성 빈맥','심방세동'], hint:'Sick Sinus Syndrome' },
+      { q:'PSVT', a:'발작성 상심실성 빈맥', opts:['발작성 심방 빈맥','심방세동','발작성 상심실성 빈맥','심방조동'], hint:'Paroxysmal Supraventricular Tachycardia' },
+      { q:'UTI', a:'요로감염', opts:['급성 신우신염','만성 신우신염','요로감염','방광암'], hint:'Urinary Tract Infection' },
+      { q:'AGN', a:'급성 사구체 신염', opts:['급성 사구체 신염','만성 사구체 신염','막사구체신염','신증후군'], hint:'Acute Glomerulonephritis' },
+      { q:'CAPD', a:'지속적 외래 복막투석', opts:['혈액투석','지속적 외래 복막투석','간헐적 복막투석','신대체요법'], hint:'Continuous Ambulatory Peritoneal Dialysis' },
+      { q:'FUO', a:'원인불명열', opts:['패혈증','원인불명열','균혈증','바이러스 감염'], hint:'Fever Unknown Origin' },
+      { q:'URI', a:'상기도 감염', opts:['하기도 감염','상기도 감염','폐렴','기관지염'], hint:'Upper Respiratory Infection' },
+      { q:'MVP', a:'승모판 탈출', opts:['승모판 협착','승모판 역류','승모판 탈출','승모판 협착폐쇄부전'], hint:'Mitral Valve Prolapse' },
+      { q:'D-CMP', a:'확장심근병', opts:['비후성 심근병','제한성 심근병','확장심근병','허혈성 심근병'], hint:'Dilated Cardiomyopathy' },
+    ]
+  },
+  abbr_med: {
+    icon: '💊',
+    title: '투약 처방 약어',
+    sub: '처방 약어 → 뜻',
+    questions: [
+      { q:'bid', a:'하루에 두 번', opts:['하루에 한 번','하루에 두 번','하루에 세 번','하루에 네 번'], hint:'bis in die' },
+      { q:'tid', a:'하루에 세 번', opts:['하루에 두 번','하루에 세 번','하루에 네 번','격일로'], hint:'ter in die' },
+      { q:'qid', a:'하루에 네 번', opts:['하루에 두 번','하루에 세 번','하루에 네 번','매 6시간마다'], hint:'quatre in die' },
+      { q:'prn', a:'필요시마다', opts:['즉시','필요시마다','취침 시간','매일 밤마다'], hint:'pro re nata' },
+      { q:'stat', a:'즉시', opts:['즉시','필요시마다','중단','위급시'], hint:'statim' },
+      { q:'npo', a:'금식', opts:['경구로','금식','식전','식후'], hint:'nor par os — nothing by mouth' },
+      { q:'ac', a:'식전', opts:['식전','식후','취침 전','필요시'], hint:'ante cibum, before meals' },
+      { q:'pc', a:'식후', opts:['식전','식후','오전','오후'], hint:'post cibos, after meals' },
+      { q:'hs', a:'취침 시간', opts:['매 1시간마다','취침 시간','매일 밤마다','격일로'], hint:'hora somni, at bedtime' },
+      { q:'qod', a:'격일로', opts:['매일','격일로','매 다른 시간','주 2회'], hint:'every other day' },
+      { q:'IM 투여 경로는?', a:'근육 내', opts:['정맥 내','근육 내','피내','피하'], hint:'intramuscular injection' },
+      { q:'SC 투여 경로는?', a:'피하', opts:['정맥 내','근육 내','피내','피하'], hint:'subcutaneous injection' },
+      { q:'ID 투여 경로는?', a:'피내', opts:['정맥 내','근육 내','피내','피하'], hint:'intradermal injection' },
+      { q:'SL 투여 경로는?', a:'설하 투여', opts:['경구','직장','설하 투여','질'], hint:'sublingual' },
+      { q:'PO 투여 경로는?', a:'경구로', opts:['경구로','직장으로','질을 통해','분무로'], hint:'par os = by mouth' },
+      { q:'sup / supp 약물 형태는?', a:'좌약', opts:['캡슐','현탁액','좌약','연고'], hint:'suppository' },
+      { q:'ung 약물 형태는?', a:'연고', opts:['시럽제','연고','로션','용액'], hint:'ointment' },
+      { q:'tab 약물 형태는?', a:'정제', opts:['캡슐','가루약','정제','시럽제'], hint:'tablet' },
+      { q:'qh (q 1h) 의미는?', a:'매 1시간마다', opts:['매 30분마다','매 1시간마다','매 2시간마다','매 4시간마다'], hint:'quaque hore, every hour' },
+      { q:'D/C 투약 처방에서의 의미는?', a:'중단', opts:['즉시','중단','필요시','정규처방'], hint:'discontinue' },
+    ]
+  }
+};
+
+const TOTAL_Q = 10;
+const nums = ['①','②','③','④'];
+
+let selectedCats = new Set();
+let pool = [], cur = 0, score = 0, answered = false, history = [];
+
+// ── INTRO LOGIC ──
+function buildCatGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => `
+    <div class="cat-card" id="cat-${key}" onclick="toggleCat('${key}')">
+      <span class="cat-icon">${cat.icon}</span>
+      <div class="cat-title">${cat.title}</div>
+      <div class="cat-sub">${cat.sub}</div>
+      <span class="cat-count">${cat.questions.length}문</span>
+    </div>
+  `).join('');
+}
+
+function toggleCat(key) {
+  if (selectedCats.has(key)) {
+    selectedCats.delete(key);
+    document.getElementById('cat-'+key).classList.remove('selected');
+  } else {
+    selectedCats.add(key);
+    document.getElementById('cat-'+key).classList.add('selected');
+  }
+  const btn = document.getElementById('start-btn');
+  if (selectedCats.size > 0) {
+    btn.disabled = false;
+    btn.textContent = `선택한 카테고리로 시작 (${selectedCats.size}개)`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = '카테고리를 선택하세요';
+  }
+}
+
+// ── QUIZ LOGIC ──
+function shuffle(a) { return [...a].sort(()=>Math.random()-0.5); }
+
+function startQuiz() {
+  let allQ = [];
+  selectedCats.forEach(key => allQ = allQ.concat(CATEGORIES[key].questions));
+  pool = shuffle(allQ).slice(0, Math.min(TOTAL_Q, allQ.length));
+  cur = 0; score = 0; answered = false; history = [];
+
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQ();
+}
+
+function renderQ() {
+  if (cur >= pool.length) { showResult(); return; }
+  const q = pool[cur];
+  const pct = Math.round(cur / pool.length * 100);
+  document.getElementById('q-counter').textContent = `${String(cur+1).padStart(2,'0')} / ${pool.length}`;
+  document.getElementById('q-score').textContent = `점수 ${score}`;
+  document.getElementById('prog-fill').style.width = pct + '%';
+
+  const isKo = /[가-힣]/.test(q.q);
+  const shuffledOpts = shuffle(q.opts);
+
+  document.getElementById('q-area').innerHTML = `
+    <div class="q-card">
+      <span class="q-badge">Q${cur+1}</span>
+      <div class="q-prompt">다음 약어/용어의 뜻은?</div>
+      <div class="q-main ${isKo?'ko':''}">${q.q}</div>
+      ${q.hint ? `<div class="q-hint">${q.hint}</div>` : ''}
+    </div>
+    <div class="options">
+      ${shuffledOpts.map((o,i) => `
+        <button class="opt" onclick="pick(this,'${o.replace(/'/g,"\\'")}')" data-label="${o.replace(/"/g,'&quot;')}">
+          <span class="num">${nums[i]}</span>${o}
+        </button>`).join('')}
+    </div>
+    <div class="feedback" id="fb"></div>
+    <button class="next-btn" id="nb" onclick="nextQ()">
+      ${cur+1 < pool.length ? '다음 문제 →' : '결과 보기 →'}
+    </button>
+  `;
+  answered = false;
+}
+
+function pick(btn, chosen) {
+  if (answered) return;
+  answered = true;
+  const q = pool[cur];
+  const isCorrect = chosen === q.a;
+  const fb = document.getElementById('fb');
+
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    const label = b.getAttribute('data-label');
+    if (label === q.a) b.classList.add(isCorrect && label === chosen ? 'correct' : 'reveal');
+  });
+
+  if (isCorrect) {
+    btn.classList.remove('reveal'); btn.classList.add('correct');
+    fb.textContent = '✓ 정답입니다!'; fb.className = 'feedback ok';
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = `✗ 오답 — 정답: "${q.a}"`; fb.className = 'feedback ng';
+  }
+  history.push(isCorrect);
+  document.getElementById('nb').style.display = 'block';
+}
+
+function nextQ() { cur++; renderQ(); }
+
+function showResult() {
+  const pct = Math.round(score / pool.length * 100);
+  let msg, sub;
+  if (pct === 100) { msg = '완벽한 점수! 🏆'; sub = '모든 문제를 정확히 맞혔습니다.'; }
+  else if (pct >= 80) { msg = '훌륭합니다!'; sub = '거의 다 맞혔어요. 아주 잘하고 있어요.'; }
+  else if (pct >= 60) { msg = '잘 했어요!'; sub = '조금 더 복습하면 완벽해질 거예요.'; }
+  else if (pct >= 40) { msg = '더 연습이 필요해요'; sub = '틀린 부분을 중심으로 다시 복습해보세요.'; }
+  else { msg = '다시 도전해봐요'; sub = '지침서를 꼼꼼히 복습한 후 재도전하세요.'; }
+
+  document.getElementById('q-area').innerHTML = `
+    <div class="result-wrap">
+      <div class="result-score-big">${score}<span style="font-size:1.8rem;color:var(--text-muted)"> / ${pool.length}</span></div>
+      <div class="result-pct">정답률 ${pct}%</div>
+      <div class="dots">${history.map(h=>`<div class="dot ${h?'ok':'ng'}"></div>`).join('')}</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-sub">${sub}</div>
+      <div class="result-actions">
+        <button class="action-btn primary" onclick="startQuiz()">같은 카테고리 재도전</button>
+        <button class="action-btn secondary" onclick="goIntro()">카테고리 다시 선택</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('prog-fill').style.width = '100%';
+}
+
+function goIntro() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('intro').style.display = 'flex';
+}
+
+buildCatGrid();
+</script>
+</body>
+</html>
